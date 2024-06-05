@@ -1,5 +1,5 @@
 #include "stdint.h"
-
+// sử dụng Port Set và Clear để on off led
 #define SIM_SCGC5 (*(volatile uint32_t*)0x40048038)
 #define PORTD_PCR5  (*(volatile uint32_t *)0x4004C014)
 #define GPIO_PDDR (*(volatile uint32_t *)0x400FF0D4)// Port Data Direction Register
