@@ -1,6 +1,7 @@
 
 #include <stdint.h>
 // đây là bản mẫu của a Nghĩa :>>
+// sử dụng pointer để cập nhật vào register và cũng không define, library
 void SystemCoreClockUpdate(void);
 
 void delay(void)
@@ -40,8 +41,6 @@ int check_bit_12(uint32_t *reg) {
     return bit12;
 
 }
-
-
 
 
 
