@@ -20,8 +20,6 @@ void delay(void)
 
 }
 
-
-
 int check_bit_12(uint32_t *reg) {
 
     // Tạo mặt nạ bit tại vị trí thứ 12
@@ -34,15 +32,11 @@ int check_bit_12(uint32_t *reg) {
 
     int bit12 = (*reg & mask) != 0;
 
-
-
     // Trả về kết quả (1 nếu bit thứ 12 là 1, 0 nếu bit thứ 12 là 0)
 
     return bit12;
 
 }
-
-
 
 void main(){
 
@@ -51,8 +45,6 @@ void main(){
 	*ptr &= ~(7U << 1);
 
 	*ptr |= (2U << 1);
-
-
 
 	ptr = (uint8_t*)0x40064001;
 
@@ -95,11 +87,6 @@ void main(){
 	*PORTD_PCR5 &= ~(7U << 8);
 
 	*PORTD_PCR5 |= (1U << 8);
-
-
-
-
-
 
 
 	// GPIO - configure pd5 = output
