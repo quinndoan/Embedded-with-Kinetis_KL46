@@ -1,5 +1,4 @@
 #include <stdint.h>
-// đây là code mẫu của ChatGPT
 #define SIM_SCGC5   (*(volatile uint32_t *)0x40048038)
 #define PORTD_PCR3  (*(volatile uint32_t *)0x4004C00C)
 #define PORTD_PCR5  (*(volatile uint32_t *)0x4004C014)
