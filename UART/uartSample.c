@@ -1,5 +1,6 @@
 #include "MKL46Z4.h"
 #include "stdint.h"
+// This code is running correctly
 
 void UART_Init();
 void UART_SendChar(char c);
@@ -11,7 +12,7 @@ int main(void) {
     UART_Init();
 
     // Send a welcome message
-    uint8_t welcomeMessage[] = "UART Initialized and ready.\r\n";
+    uint8_t welcomeMessage[] = "HUN is a baby and Hin is writing this code.\r\n";
     UART_TransmitString(welcomeMessage, sizeof(welcomeMessage) - 1);
 
     // Main loop
