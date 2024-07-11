@@ -3,6 +3,8 @@
 
 // dùng UART Interrupt để đánh dấu mỗi lần truyền tin, và gửi nó vào buffer
 // Đã check truyền gửi đúng thông qua Send() và Receive()
+// cứ mỗi lần nhận được ký hiệu là lưu vào buffer
+
 #define BUFFER_SIZE 128
 
 volatile uint8_t rxBuffer[BUFFER_SIZE];
@@ -106,7 +108,7 @@ char UART_ReceiveChar(void) {
 }
 
 void UART0_IRQHandler(void) {
-    // Check if receive data register full flag is set
+    // Check if receive data register full flag is set, khi này Receive data buffer đã full
     if (UART0->S1 & UART0_S1_RDRF_MASK) {
         // Read received character and store in buffer
         rxBuffer[rxIndex] = UART0->D;
