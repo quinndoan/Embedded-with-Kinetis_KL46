@@ -3,7 +3,7 @@
 #include "stdbool.h"
 
 #define BUFFER_SIZE 256
-#define QUEUE_SIZE 10
+#define QUEUE_SIZE 15
 #define FLASH_START_ADDRESS 0x00020000
 
 volatile uint8_t rxBuffer[BUFFER_SIZE];
