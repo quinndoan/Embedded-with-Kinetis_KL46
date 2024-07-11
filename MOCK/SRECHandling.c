@@ -2,10 +2,13 @@
 #include "stdint.h"
 #include "stdbool.h"
 #include <string.h>
+#include <stdlib.h>
+#include <math.h>
 
 #define BUFFER_SIZE 256
 #define QUEUE_SIZE 15
-//#define FLASH_START_ADDRESS 0x00020000
+#define FLASH_START_ADDRESS 0x00020000
+#define HEX_INVALID 255
 
 volatile uint8_t rxBuffer[BUFFER_SIZE];
 volatile uint8_t rxIndex = 0;
@@ -51,8 +54,7 @@ int main(void) {
 
         QueueItem item;
         if (Queue_Dequeue(&srecQueue, &item)) {
-            // Send dequeued item back to PC
-            UART_TransmitString(item.data, item.length);
+            Process_SREC(&item);
         }
     }
 
@@ -162,8 +164,117 @@ void Flash_Write(uint32_t address, uint8_t *data, uint32_t length) {
     // Note: Make sure the address is valid and not overlapping with program code
 }
 
+uint8_t char_to_hex(uint8_t c) {
+    uint8_t result;
+
+    if ('0' <= c && c <= '9') {
+        result = c - '0';
+    } else if ('A' <= c && c <= 'F') {
+        result = c - 'A' + 10;
+    } else {
+        result = HEX_INVALID;
+    }
+
+    return result;
+}
+
+uint32_t StrtoHex(const char *str, uint8_t len, uint32_t *pDecimal) {
+    *pDecimal = 0;
+    uint32_t idx;
+
+    for (idx = 0; idx < len; idx++) {
+        *pDecimal += (char_to_hex(str[idx])) * pow(16, len - 1 - idx);
+    }
+
+    return *pDecimal;
+}
+
+struct Srec* ReadCheckLine(const char *line) {
+    struct Srec *line1 = (struct Srec *)malloc(sizeof(struct Srec));
+    if (line1 == NULL) {
+        // Handle memory allocation failure
+        return NULL;
+    }
+
+    uint8_t a1 = line[0]; // Supposed to be 'S'
+
+    uint8_t a2 = line[1];
+    uint8_t a2Number = char_to_hex(a2);
+
+    if (a2Number == 1 || a2Number == 5 || a2Number == 9) {
+        line1->sizeOfAddress = 4; // Read 4 characters for Address
+    } else if (a2Number == 2 || a2Number == 6 || a2Number == 8) {
+        line1->sizeOfAddress = 6; // Read 6 characters for Address
+    } else {
+        line1->sizeOfAddress = 8; // Read 8 characters for Address
+    }
+
+    // Handle ByteCount
+    char a3[3];
+    strncpy(a3, &line[2], 2);
+    a3[2] = '\0';
+    uint32_t byteCount;
+    StrtoHex(a3, 2, &byteCount);
+    line1->ByteCount = byteCount;
+
+    // Handle Address
+    uint8_t lengthAddress = line1->sizeOfAddress;
+    line1->Address = (char *)malloc(lengthAddress + 1);
+    if (line1->Address == NULL) {
+        free(line1);
+        return NULL;
+    }
+    strncpy(line1->Address, &line[4], lengthAddress);
+    line1->Address[lengthAddress] = '\0';
+
+    // Handle Data
+    uint32_t numberDataByte = (line1->ByteCount) - 1 - (line1->sizeOfAddress / 2);
+    line1->sizeOfData = numberDataByte * 2; // Number of characters for Data
+    line1->Data = (char *)malloc(line1->sizeOfData + 1);
+    if (line1->Data == NULL) {
+        free(line1->Address);
+        free(line1);
+        return NULL;
+    }
+    strncpy(line1->Data, &line[4 + lengthAddress], line1->sizeOfData);
+    line1->Data[line1->sizeOfData] = '\0';
+
+    // Handle CheckSum
+    char a6[3];
+    strncpy(a6, &line[4 + lengthAddress + line1->sizeOfData], 2);
+    a6[2] = '\0';
+    uint32_t checkSum;
+    StrtoHex(a6, 2, &checkSum);
+    line1->checkSum = checkSum;
+
+    return line1;
+}
+
 void Process_SREC(QueueItem *item) {
-    // Implement SREC parsing and processing logic here
-    // Example: Check checksum, parse data, and write to Flash
-  //  Flash_Write(FLASH_START_ADDRESS, item->data, item->length);
+    // Split the data into lines
+    char *line = strtok((char *)item->data, "\n");
+    while (line != NULL) {
+        struct Srec *srecLine = ReadCheckLine(line);
+        if (srecLine != NULL) {
+            uint32_t address;
+            StrtoHex(srecLine->Address, strlen(srecLine->Address), &address);
+
+            // Convert Data from hex string to byte array
+            uint8_t data[srecLine->sizeOfData / 2];
+            for (uint32_t i = 0; i < srecLine->sizeOfData; i += 2) {
+                uint32_t byte;
+                StrtoHex(&srecLine->Data[i], 2, &byte);
+                data[i / 2] = (uint8_t)byte;
+            }
+
+            // Write data to Flash
+            Flash_Write(address, data, srecLine->sizeOfData / 2);
+
+            // Free allocated memory
+            free(srecLine->Address);
+            free(srecLine->Data);
+            free(srecLine);
+        }
+        line = strtok(NULL, "\n");
+    }
 }
