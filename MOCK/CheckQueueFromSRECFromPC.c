@@ -1,6 +1,7 @@
 #include "MKL46Z4.h"
 #include "stdint.h"
 #include "stdbool.h"
+#include <string.h>
 
 #define BUFFER_SIZE 256
 #define QUEUE_SIZE 15
@@ -50,7 +51,8 @@ int main(void) {
 
         QueueItem item;
         if (Queue_Dequeue(&srecQueue, &item)) {
-            Process_SREC(&item);
+            // Send dequeued item back to PC
+            UART_TransmitString(item.data, item.length);
         }
     }
 
@@ -163,30 +165,5 @@ void Flash_Write(uint32_t address, uint8_t *data, uint32_t length) {
 void Process_SREC(QueueItem *item) {
     // Implement SREC parsing and processing logic here
     // Example: Check checksum, parse data, and write to Flash
-    Flash_Write(FLASH_START_ADDRESS, item->data, item->length);
-}
-
-void test_queue() {
-    const char *srecLines[] = {
-        "S0100000626C696E6B4C65642E73726563EF\n",
-        "S1130000285F245F2212226A000424290008237C2A\n",
-        "S11300100002000800082629001853812341001813\n",
-        "S11300200002000800082629001853812341001813\n",
-        "S1070030000200080008262B\n",
-    };
-    const int numLines = sizeof(srecLines) / sizeof(srecLines[0]);
-
-    printf("Enqueue SREC lines:\n");
-    for (int i = 0; i < numLines; i++) {
-        Queue_Enqueue(&srecQueue, (uint8_t *)srecLines[i], strlen(srecLines[i]));
-        printf("%s", srecLines[i]);
-    }
-
-    printf("\nDequeuing SREC lines:\n");
-    QueueItem item;
-    while (Queue_Dequeue(&srecQueue, &item)) {
-        for (int i = 0; i < item.length; i++) {
-            printf("%c", item.data[i]);
-        }
-    }
+  //  Flash_Write(FLASH_START_ADDRESS, item->data, item->length);
 }
