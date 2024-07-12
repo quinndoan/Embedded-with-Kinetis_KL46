@@ -3,6 +3,7 @@ typedef enum{
 	_9_bits,
 }UART0_Data_Length;
 
+// Bản tham khảo
 typedef enum{
 	No_Parity = 1,
 	Even_Parity = 2,
