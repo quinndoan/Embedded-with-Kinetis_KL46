@@ -4,7 +4,7 @@
 #include<math.h>
 #include "sub.h"
 #include <stdlib.h>
-
+// Using DevC for this file, only for checking SREC types
 #define HEX_INVALID 255
 
 uint8_t char_to_hex(uint8_t c) {

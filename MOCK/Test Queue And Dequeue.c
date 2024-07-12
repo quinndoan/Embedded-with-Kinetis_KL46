@@ -2,6 +2,8 @@
 #include "stdint.h"
 #include "stdbool.h"
 
+// Using DevC for test Queue and Dequeue
+
 #define BUFFER_SIZE 256
 #define QUEUE_SIZE 15
 #define FLASH_START_ADDRESS 0x00020000
