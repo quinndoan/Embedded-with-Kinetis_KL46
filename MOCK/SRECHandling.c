@@ -26,6 +26,17 @@ typedef struct {
     uint8_t count;
 } Queue;
 
+struct Srec{
+    uint8_t recordType;
+    uint8_t sizeOfAddress;
+    uint32_t ByteCount;
+    uint32_t sizeOfData;
+    uint32_t checkSum;
+    char *Address;
+    char *Data;
+    uint8_t checksum;
+} ReadSrec;
+
 Queue srecQueue = {{0}, 0, 0, 0};
 
 void UART_Initialize();
