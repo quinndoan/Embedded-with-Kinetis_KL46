@@ -1,3 +1,39 @@
+typedef enum{
+	_8_bits,
+	_9_bits,
+}UART0_Data_Length;
+
+typedef enum{
+	No_Parity = 1,
+	Even_Parity = 2,
+	Odd_Parity = 3,
+}Parity_t;
+
+typedef enum{
+	LSB,
+	MSB,
+}Transmit_Order_t;
+
+typedef enum{
+	No_Interrupt,
+	Interrupt,
+}UART0_Interrupt_t;
+
+typedef enum{
+	Receiver,
+	Transmitter,
+}UART0_Direction_t;
+
+typedef struct{
+	uint8_t UART0_Stop_Bit;
+	uint16_t Baud_Rate;
+	UART0_Data_Length Data_Length;
+	UART0_Interrupt_t UART0_Interrupt;
+	UART0_Direction_t Direction;
+	Parity_t Parity;
+	Transmit_Order_t Transmit_Order;
+}UART0_Innit_t;
+
 void UART0_Innit(UART0_Innit_t *UART0_Info){
 	//Enable Clock for UART0
 	SIM->SCGC4 |= (SIM_SCGC4_UART0(1u));
