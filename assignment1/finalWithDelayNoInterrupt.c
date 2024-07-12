@@ -1,4 +1,4 @@
-
+// Using pooling to delay toggle Led, not Interrupt
 #include "stdint.h"
 #include "MKL46Z4.h"
 void delay(void){
