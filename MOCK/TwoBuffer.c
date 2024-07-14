@@ -121,3 +121,21 @@ int main() {
 
     return 0;
 }
+
+while (1) {
+        if (newLine) {
+            newLine = false;
+            if (rxIndex > 0) { // Ensure there's something to process
+                memcpy((char *)procBuffer, (char *)rxBuffer, rxIndex);
+                procIndex = rxIndex;
+                rxIndex = 0; // Reset index for the next line
+                procReady = true;
+            }
+        }
+
+        if (procReady) {
+            procReady = false;
+            Queue_Enqueue(&srecQueue, (char *)procBuffer, procIndex);
+            procIndex = 0; // Reset index for the next line
+        }
+}
