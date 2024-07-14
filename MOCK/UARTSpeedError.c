@@ -6,6 +6,8 @@
 #include <math.h>
 #include <stdio.h>
 
+// bị đè dữ liệu khi UART chạy quá nhanh so với tốc độ truyền
+
 #define BUFFER_SIZE 256
 #define QUEUE_SIZE 30
 #define HEX_INVALID 255
